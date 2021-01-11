@@ -15,6 +15,7 @@ def entry():
     bucket = os.environ.get('BUCKET')
 
     if bucket is None:
+        print("Error: The BUCKET environment variable is not for this trigger.")
         return ("Error the BUCKET environment variable is not set for this instance", 500)
 
     # This regex just extracts the bucket name and file path from the resource name
@@ -25,10 +26,11 @@ def entry():
     if matches is None or len(matches) == 0:
         return ("Created file doesn't match pattern", 200)
 
+    # Split out the filename and extension from the path
     path = matches[0]
     filename, extension = os.path.splitext(path)
 
-    # Check if the file is a CSV or not
+    # Check if the file is a CSV or not based upon the extension
     if extension != '.csv':
         print("Warning: File uploaded is not a CSV so not loading into BigQuery.")
         return ("Created file isn't a CSV", 200)
@@ -43,16 +45,18 @@ def entry():
         print("Error: Table env variable not set, so returning.")
         return ("Error BIGQUERY_TABLE environment variable is not set.", 500)
 
-    # Setup and perform the load
+    # Setup the job to append to the table if it already exists and to autodetect the schema
     job_config = bigquery.LoadJobConfig(
         write_disposition=bigquery.WriteDisposition.WRITE_APPEND,
         source_format=bigquery.SourceFormat.CSV,
         autodetect=True,
     )
+
+    # Run the load job
     load_job = client.load_table_from_uri(uri, table, job_config=job_config)
 
-    # Run the job synchronously
-    result = load_job.result()
+    # Run the job synchronously and wait for it to complete
+    load_job.result()
 
     return (f"Loaded file located at {uri} into BQ table {table}", 200)
 
