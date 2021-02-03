@@ -1,6 +1,6 @@
 # Sayle's Eventarc Medium Article Code
 
-This is the codebase to be used with the Medium article located at: <TODO add the URL here>
+This is the codebase to be used with the Medium article located at: https://blog.doit-intl.com/triggering-almost-any-event-in-cloud-run-using-eventarc-db473f1ec4ca
 
 ## Notes
 This code is intended to be a proof-of-concept and show you how to use Cloud Run and Eventarc. It is not intended to be run in a production environment as-is as many best practices around running it are outside the scope of the article subject.
